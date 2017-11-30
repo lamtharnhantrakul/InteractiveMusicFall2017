@@ -11,15 +11,20 @@ from pythonosc import udp_client
 client = language.LanguageServiceClient()
 
 # Sets up a UDP port for communication with MaxMSP
-
-UDP_IP = "127.0.0.1"
-UDP_PORT = 5005
-
-
 maxClient = udp_client.UDPClient('127.0.0.1', 8000)
 
+def sendUDPmsg(score, magnitude):
+    msg = osc_message_builder.OscMessageBuilder(address = '/sentiment')
+    msg.add_arg(score)
+    msg.add_arg(magnitude)
+    msg = msg.build()
+    maxClient.send(msg)
+    print('Message sent through UDP:','127.0.0.1',8000)
 
+# Send an init message
+sendUDPmsg(0.0, 1.0)
 
+# Loop
 while True:
     print('-' * 70)
     text = input("Enter text to analyze: ")
@@ -29,20 +34,7 @@ while True:
 
     # Detects the sentiment of the text
     sentiment = client.analyze_sentiment(document=document).document_sentiment
-    payload = float(sentiment.score)
-    print(payload)
-    #print('Text: {}'.format(text))
     print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))
 
-    sock = socket.socket(socket.AF_INET, # Internet
-                         socket.SOCK_DGRAM) # UDP
-    sock.sendto(bytes(text, "utf-8"), (UDP_IP, UDP_PORT))
-    print('Message sent through UDP:',UDP_IP,UDP_PORT)
-
-    msg = osc_message_builder.OscMessageBuilder(address = '/sentiment')
-    msg.add_arg(sentiment.score)
-    msg.add_arg(sentiment.magnitude)
-    msg = msg.build()
-    maxClient.send(msg)
-
-    print('Message sent through UDP:',UDP_IP,8000)
+    # Packages message to send to Max/MSP via UDP
+    sendUDPmsg(sentiment.score,sentiment.magnitude)
