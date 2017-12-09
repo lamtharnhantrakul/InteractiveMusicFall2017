@@ -74,14 +74,10 @@ if __name__ == '__main__':
     print("Ready to run...")
 
     # main loop is a finite state machine
-    while True:
-        if state == 'listening':
-            init_sequence = []
-            if len(queue) > LSTM_lookback:
-                while len(init_sequence) < LSTM_lookback: # LSTM_lookback = 30
-                    init_sequence.append(queue.popleft())
-                state == 'predicting'
-            else:
-                print("queue does not contain enough initial values")
-        elif state == 'predicting':
-            print('predicting!')
+    init_sequence = []
+    if len(queue) > LSTM_lookback:
+        while len(init_sequence) < LSTM_lookback: # LSTM_lookback = 30
+            init_sequence.append(queue.popleft())
+        state == 'predicting'
+    else:
+        print("queue does not contain enough initial values")
