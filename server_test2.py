@@ -29,7 +29,7 @@ LSTM_lookback = 30
 
 
 
-# rewrite according to https://github.com/AvneeshSarwate/MUS7100_Fall_2017/blob/master/Interface-5/LemurBounce2.py
+# rewrite according to https://github.com/AvneeshSarwate/MUS7100_Fall_2017/blob/master/Interface-5/LemurBounce2.pyçç
 def sendUDPmsg(index,prediction):
     msg = osc_message_builder.OscMessageBuilder(address = '/prediction')
     msg.add_arg(int(index)) # prepend with an index for Max/MSP `coll` object
@@ -59,7 +59,17 @@ def genSendPredictions(init_sequence):
             pattern = np.concatenate((pattern, prediction), axis=0)
             pattern = pattern[1:len(pattern),:]
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+        final_x = prediction_reshaped[0]
+        final_y = prediction_reshaped[1]
+        final_pressure = prediction_reshaped[2]
+        fade_pressures = np.linspace(final_pressure, 0.0, num=20)
+
+        for j in range(20):
+            ramp_values = np.array((final_x, final_y, fade_pressures[j]))
+            sendUDPmsg(j+100, ramp_values)
+
+
+    #print("--- %s seconds ---" % (time.time() - start_time))
 
 def data_handler(unused_addr,x_coor,y_coor,pressure):
     data_point = np.array((x_coor,y_coor,pressure))
@@ -69,6 +79,11 @@ def data_handler(unused_addr,x_coor,y_coor,pressure):
         _ = queue.popleft() # pop oldest value out of queue
         queue.append(data_point) # add newest value to queue
     print(len(queue))
+
+def finger_touch_handler(unused_addr, touch_idx):
+    # empty the queue when user touches lightpad or when they release their finger
+    while (len(queue) > 0):
+        queue.popleft()
 
 class predictionThread (threading.Thread):
     def __init__(self):
@@ -98,6 +113,7 @@ if __name__ == '__main__':
     # Define the server_thread
     dispatcher = dispatcher.Dispatcher()
     dispatcher.map("/data", data_handler)
+    dispatcher.map("/finger_touch", finger_touch_handler)
 
     server = osc_server.ThreadingOSCUDPServer(('127.0.0.1', 8001), dispatcher)
     server_thread = threading.Thread(target=server.serve_forever)
