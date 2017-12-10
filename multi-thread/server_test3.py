@@ -26,7 +26,6 @@ print("Max/MSP to Server connection Initiated")
 queue = deque()
 queue_limit = 40  # same number as LSTM lookback
 LSTM_lookback = 30
-
 finger_down = 0
 
 
