@@ -75,6 +75,7 @@ if __name__ == '__main__':
 
     # main loop is a finite state machine
     init_sequence = []
+    while True
     if len(queue) > LSTM_lookback:
         while len(init_sequence) < LSTM_lookback: # LSTM_lookback = 30
             init_sequence.append(queue.popleft())
