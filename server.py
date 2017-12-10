@@ -29,25 +29,9 @@ class data(object):
         while (len(self.queue) > 0):
             self.queue.popleft()
 
-class stateMachineThread (threading.Thread):
-    def __init__(self, MaxData):
-        super(stateMachineThread, self).__init__()
-        self.queue = MaxData.queue
-        self.LSTM_lookback = MaxData.LSTM_lookback
-        self.init_sequence = []
-        self.state = 'listening'  # defaults to listening state
-
-    def run(self):
-        # Start state state machine
-        while True:
-            if self.state == 'listening':
-                if len(self.queue) > self.LSTM_lookback:
-                    while len(self.init_sequence) < self.LSTM_lookback: # LSTM_lookback = 30
-                        self.init_sequence.append(self.queue.popleft())
-
-def data_handler(unused_addr, args, x_coor, y_coor, pressure):
+def data_handler(unused_addr, args, *osc_args):
     dataObj = args[0] # the `data()` object comes through this callback via `args`
-    data_point = np.array((x_coor,y_coor,pressure)) # any OSC data routed through address `/light_pad
+    data_point = np.array((osc_args[0],osc_args[1],osc_args[2])) # any OSC data routed through address `/light_pad
     dataObj.add(data_point)
 
 def finger_touch_handler(unused_addr, args, finger_down_bool):
@@ -71,9 +55,7 @@ if __name__ == '__main__':
     serverThread = threading.Thread(target=server.serve_forever)
 
     # Define the prediction_thread
-    stateThread = stateMachineThread(MaxData)
+    #stateThread = stateMachineThread(MaxData)
 
     # Start the two threads
     serverThread.start()
-    stateThread.start()
-    print("Exiting main thread")
