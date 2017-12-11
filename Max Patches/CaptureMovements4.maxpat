@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 38.0, 56.0, 1656.0, 990.0 ],
+		"rect" : [ 38.0, 56.0, 1210.0, 990.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -45,7 +45,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 1356.06958, 393.0, 89.0, 22.0 ],
 					"style" : "",
-					"text" : "/player_state 0"
+					"text" : "/player_state 0"
 				}
 
 			}
@@ -200,7 +200,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ -48.0, 306.0, 168.0, 22.0 ],
 					"style" : "",
-					"text" : "0.538462 0.357998 0.019608"
+					"text" : "0.461538 0.307692 0."
 				}
 
 			}
@@ -292,7 +292,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 230.0, 191.0, 68.0, 22.0 ],
 					"style" : "",
-					"text" : "0.384615"
+					"text" : "0.307692"
 				}
 
 			}
@@ -305,7 +305,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 137.0, 191.0, 74.0, 22.0 ],
 					"style" : "",
-					"text" : "0.538462"
+					"text" : "0.461538"
 				}
 
 			}
@@ -2790,16 +2790,16 @@
 			}
  ],
 		"parameters" : 		{
-			"obj-77" : [ "number[3]", "number[2]", 0 ],
-			"obj-97" : [ "number", "number", 0 ],
-			"obj-125" : [ "live.dial", "macro1", 0 ],
-			"obj-90" : [ "number[4]", "number[1]", 0 ],
 			"obj-129" : [ "live.dial[4]", "macro5", 0 ],
-			"obj-128" : [ "live.dial[3]", "macro4", 0 ],
-			"obj-127" : [ "live.dial[2]", "macro3", 0 ],
-			"obj-126" : [ "live.dial[1]", "macro2", 0 ],
 			"obj-95" : [ "number[2]", "number[2]", 0 ],
-			"obj-96" : [ "number[1]", "number[1]", 0 ]
+			"obj-96" : [ "number[1]", "number[1]", 0 ],
+			"obj-77" : [ "number[3]", "number[2]", 0 ],
+			"obj-128" : [ "live.dial[3]", "macro4", 0 ],
+			"obj-97" : [ "number", "number", 0 ],
+			"obj-90" : [ "number[4]", "number[1]", 0 ],
+			"obj-127" : [ "live.dial[2]", "macro3", 0 ],
+			"obj-125" : [ "live.dial", "macro1", 0 ],
+			"obj-126" : [ "live.dial[1]", "macro2", 0 ]
 		}
 ,
 		"dependency_cache" : [ 			{
