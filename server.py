@@ -12,6 +12,12 @@ from distutils.util import strtobool
 from keras.models import load_model
 import tensorflow as tf
 
+# DEBUG flag
+DEBUG = True
+
+# number of samples before LSTM thinks you are interrupting it
+interrupt_length = 20
+
 # Load a trained model
 graph = tf.get_default_graph() # hack around keras tensorflow in multiple threads
 # read https://github.com/fchollet/keras/issues/5896 for more information on the hack
@@ -22,6 +28,7 @@ print("completed model...")
 
 # hack to make state machine in python server work
 state = 'listening'
+finger_down = 0
 
 def data_handler(unused_addr, args, *osc_args):
     # (args[0], args[1] = (queue, queue_limit)
@@ -35,32 +42,38 @@ def data_handler(unused_addr, args, *osc_args):
     else:
         _ = queue.popleft() # pop oldest value out of queue
         queue.append(data_point) # add newest value to queue
-    print(len(queue))
-    sendUDPmsg("/queue_length", maxClient, int(len(queue)))
+    if DEBUG:
+        print("queue len: %s " % len(queue))
+
+    if state != 'playing':
+        sendUDPmsg("/queue_length", maxClient, int(len(queue)))
 
 def finger_touch_handler(unused_addr, args, *osc_args):
-    # (args[0], args[1] = (queue, finger_down)
+    # args[0]= queue
     # osc_args[0] = finger_down (true or false) from Max/MSP
 
     # Change the state of finger_down
-    finger_down = args[1]
     finger_down = int(osc_args[0])
-    #print("finger_down:",finger_down)
+    if DEBUG:
+        print("finger_down:",finger_down)
     # empty the queue when user touches lightpad or when they release their finger
     queue = args[0]
     while (len(queue) > 0):
         queue.popleft()
-    #sendUDPmsg("/queue_length", maxClient, int(len(queue)))
+
+    if state != 'playing':
+        sendUDPmsg("/queue_length", maxClient, int(len(queue)))
 
 def player_state_handler(unused_addr, *osc_args):
     # osc_args[0] = player_state (0 or 1) from Max/MSP
 
     player_state = osc_args[0]
-    print(player_state)
     if player_state == 0:
         global state
         state = 'listening'
-        print("switched to listening state")
+
+        if DEBUG:
+            print("switched to listening state")
 
 def sendUDPmsg(address,maxClient,*args):
     msg = osc_message_builder.OscMessageBuilder(address = address)
@@ -120,15 +133,14 @@ def genSendPredictions(init_sequence):
             ramp_datum = appendIdx(j+num_predictions,ramp_values)
             #sendUDPmsg("/prediction", maxClient, ramp_datum)
             sendValues(maxClient,ramp_datum)
-
-    print("--- %s seconds ---" % (time.time() - start_time))
+    if DEBUG:
+        print("--- LSTM prediction time: %s ---" % (time.time() - start_time))
 
 if __name__ == '__main__':
     # Define the data that will be manipulated by the handlers
     queue = deque()
     queue_limit = 40
     LSTM_lookback = 30
-    finger_down = 0
 
     # Define the server -> Max/MSP port
     maxClient = udp_client.UDPClient('127.0.0.1', 8000)
@@ -136,7 +148,7 @@ if __name__ == '__main__':
     # Define the server_thread
     dispatcher = dispatcher.Dispatcher()
     dispatcher.map("/lightpad_data", data_handler, queue, queue_limit)
-    dispatcher.map("/finger_down", finger_touch_handler, queue, finger_down)
+    dispatcher.map("/finger_down", finger_touch_handler, queue)
     dispatcher.map("/player_state", player_state_handler)
 
     server = osc_server.ThreadingOSCUDPServer(('127.0.0.1', 8001), dispatcher)
@@ -150,15 +162,14 @@ if __name__ == '__main__':
 
     print(" ------ Start playing! -------")
     while True:
-        #print(self.state)
-        #print("player_state:", player_state)
-        #print(state)
         if state == 'listening':
-            if len(queue) >= LSTM_lookback:
+            if (len(queue) >= LSTM_lookback and finger_down == 0):
                 while len(init_seq) < LSTM_lookback: # LSTM_lookback = 30
                     init_seq.append(queue.popleft())
                 state = 'predicting'
-                print("switched to predicting state")
+
+                if DEBUG:
+                    print("switched to predicting state")
 
         elif state == 'predicting':
 
@@ -168,18 +179,23 @@ if __name__ == '__main__':
             player_state = 1
             sendUDPmsg("/player_state", maxClient, int(player_state))
             state = 'playing'
-            print("switched to playing state")
+            if DEBUG:
+                print("switched to playing state")
 
         elif state == 'playing':
             '''
             the `player_state_handler()` breaks out of this loop when it receives
             a command from Max/MSP that the player has finished playing the sequence
+            think of `player_state_handler()` like an arduino interrupt function
             '''
 
-            if len(queue) > 10:
+            if len(queue) > interrupt_length:
                 # This must be an interruption
-                print("Interrupted!")
+                if DEBUG:
+                    print("Interrupted!")
                 player_state = 0
                 sendUDPmsg("/player_state", maxClient, int(player_state))
                 state = 'listening'
-                print("switched to listening state")
+
+                if DEBUG:
+                    print("switched to listening state")
