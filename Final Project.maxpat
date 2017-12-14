@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 38.0, 56.0, 1608.0, 960.0 ],
+		"rect" : [ 38.0, 56.0, 679.0, 344.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -44,7 +44,6 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 694.599976, 343.791412, 29.5, 22.0 ],
-					"presentation_rect" : [ 730.599976, 343.791412, 0.0, 0.0 ],
 					"style" : "",
 					"text" : "1"
 				}
@@ -1294,7 +1293,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 931.0, 364.049988, 180.0, 22.0 ],
 					"style" : "",
-					"text" : "0.692308 0.461538 0."
+					"text" : "0.615385 0.817827 0.027451"
 				}
 
 			}
@@ -4050,15 +4049,15 @@
  ],
 		"parameters" : 		{
 			"obj-90" : [ "number[4]", "number[1]", 0 ],
+			"obj-95" : [ "number[2]", "number[2]", 0 ],
+			"obj-96" : [ "number[1]", "number[1]", 0 ],
 			"obj-129" : [ "live.dial[4]", "macro5", 0 ],
 			"obj-125" : [ "live.dial", "macro1", 0 ],
-			"obj-95" : [ "number[2]", "number[2]", 0 ],
-			"obj-127" : [ "live.dial[2]", "macro3", 0 ],
-			"obj-126" : [ "live.dial[1]", "macro2", 0 ],
-			"obj-96" : [ "number[1]", "number[1]", 0 ],
 			"obj-128" : [ "live.dial[3]", "macro4", 0 ],
-			"obj-97" : [ "number", "number", 0 ],
-			"obj-77" : [ "number[3]", "number[2]", 0 ]
+			"obj-127" : [ "live.dial[2]", "macro3", 0 ],
+			"obj-77" : [ "number[3]", "number[2]", 0 ],
+			"obj-126" : [ "live.dial[1]", "macro2", 0 ],
+			"obj-97" : [ "number", "number", 0 ]
 		}
 ,
 		"dependency_cache" : [ 			{
